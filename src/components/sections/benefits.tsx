@@ -1,11 +1,19 @@
 import { benefits } from "@/content/site";
-import { SectionHeading } from "@/components/brand/section-heading";
+import { Separator } from "@/components/ui/separator";
 
 export function Benefits() {
   return (
     <section id="lo-que-ofrecemos" aria-labelledby="lo-que-ofrecemos-heading" className="py-16 md:py-24">
       <div className="container-grid">
-        <SectionHeading id="lo-que-ofrecemos-heading">{benefits.heading}</SectionHeading>
+        <div className="flex flex-col items-center gap-6">
+          <h2
+            id="lo-que-ofrecemos-heading"
+            className="text-center text-xl tracking-eyebrow text-taupe-500 uppercase md:text-2xl"
+          >
+            {benefits.heading}
+          </h2>
+          <Separator className="max-w-[70%] data-horizontal:w-56 md:data-horizontal:w-80" />
+        </div>
 
         <ul className="mx-auto mt-14 grid max-w-4xl grid-cols-1 gap-x-16 gap-y-14 md:grid-cols-2 md:mt-20">
           {benefits.items.map((item) => (

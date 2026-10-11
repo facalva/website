@@ -1,70 +1,81 @@
 import Link from "next/link";
 
-import { nav } from "@/content/site";
+import { brandNav, features, secondaryNav } from "@/content/site";
 import { FacalvaWordmark } from "@/components/brand/facalva-wordmark";
+import { SubBrandLogo } from "@/components/brand/sub-brand-logo";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { SearchField } from "@/components/layout/search-field";
+import { cn } from "@/lib/utils";
 
-const [alvarado, monica, ...rightNav] = nav;
+/**
+ * While the right-hand tools (Nuestros Pasos / Contacto / search) are hidden,
+ * mónica moves right to balance Alvarado Collection on the left. Turning
+ * either feature back on restores the comp's arrangement.
+ */
+const showRightTools = features.secondaryNav || features.search;
+
+function BrandLink({ brand }: { brand: keyof typeof brandNav }) {
+  return (
+    <Link href={brandNav[brand].href} className="flex items-center transition-opacity hover:opacity-70">
+      <SubBrandLogo brand={brand} tone="light" size="header" />
+    </Link>
+  );
+}
+
+function HomeLink({ className }: { className?: string }) {
+  return (
+    <Link href="/" aria-label="FACALVA — Inicio" className={className}>
+      <FacalvaWordmark />
+    </Link>
+  );
+}
 
 export function SiteHeader() {
   return (
-    <header className="bg-brand-900 sticky top-0 z-50 h-(--spacing-header)">
-      <div className="mx-auto flex h-full max-w-[1600px] items-center gap-3 px-5 lg:gap-6 lg:px-10">
-        {/* ── below lg: hamburger · wordmark · search fills the remainder ── */}
+    <header className="sticky top-0 z-50 h-(--spacing-header) bg-brand-900">
+      {/* ── below lg: hamburger · centred wordmark (· search) ── */}
+      <div
+        className={cn(
+          "mx-auto h-full items-center gap-3 px-3 lg:hidden",
+          features.search ? "flex" : "grid grid-cols-[1fr_auto_1fr]",
+        )}
+      >
         <MobileNav />
+        <HomeLink className={features.search ? "" : "justify-self-center"} />
+        {features.search && <SearchField className="ml-auto max-w-[260px]" />}
+      </div>
 
-        <Link href="/" className="lg:hidden" aria-label="FACALVA — Inicio">
-          <FacalvaWordmark />
-        </Link>
+      {/*
+        ── lg and up: three zones ──
+        A grid, not justify-between. The side groups can have very different
+        widths, so space-between would push the FACALVA lockup off true centre.
+      */}
+      <div className="mx-auto hidden h-full max-w-[1600px] grid-cols-[1fr_auto_1fr] items-center gap-6 px-10 lg:grid">
+        <nav aria-label="Colecciones" className="flex items-center gap-8">
+          <BrandLink brand="alvarado" />
+          {showRightTools && <BrandLink brand="monica" />}
+        </nav>
 
-        <SearchField className="ml-auto w-full max-w-[260px] lg:hidden" />
+        <HomeLink className="justify-self-center" />
 
-        {/*
-          ── lg and up: three zones ──
-          A grid, not justify-between. The left group (two sub-brand wordmarks)
-          and right group (two links + search) have very different widths, so
-          space-between would push the FACALVA lockup off true centre — the comp
-          has it dead centre at ~49.7% of the viewport.
-        */}
-        <div className="hidden w-full grid-cols-[1fr_auto_1fr] items-center lg:grid">
-          <nav aria-label="Colecciones" className="flex items-center gap-8">
-            {[alvarado, monica].map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className="flex items-center transition-opacity hover:opacity-70"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={item.wordmark.light}
-                  alt={item.label}
-                  width={Math.round(item.wordmark.ratio * 14)}
-                  height={14}
-                  className={item.label === "mónica" ? "h-4 w-auto" : "h-3 w-auto"}
-                />
-              </Link>
-            ))}
-          </nav>
+        <div className="flex items-center justify-end gap-6">
+          {!showRightTools && <BrandLink brand="monica" />}
 
-          <Link href="/" aria-label="FACALVA — Inicio" className="justify-self-center">
-            <FacalvaWordmark />
-          </Link>
-
-          <div className="flex items-center justify-end gap-6">
+          {features.secondaryNav && (
             <nav aria-label="Secundaria" className="flex items-center gap-6">
-              {rightNav.map((item) => (
+              {secondaryNav.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="tracking-eyebrow text-[11px] whitespace-nowrap text-white uppercase transition-opacity hover:opacity-70"
+                  className="text-[11px] tracking-eyebrow whitespace-nowrap text-white uppercase transition-opacity hover:opacity-70"
                 >
                   {item.label}
                 </Link>
               ))}
             </nav>
-            <SearchField className="w-[210px]" />
-          </div>
+          )}
+
+          {features.search && <SearchField className="w-[210px]" />}
         </div>
       </div>
     </header>

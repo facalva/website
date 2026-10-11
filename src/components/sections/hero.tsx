@@ -1,7 +1,9 @@
 import Image from "next/image";
 
+import { ChevronDownIcon } from "lucide-react";
+
 import { hero } from "@/content/site";
-import { ChevronDownIcon } from "@/components/icons";
+import { Separator } from "@/components/ui/separator";
 
 export function Hero() {
   return (
@@ -32,7 +34,7 @@ export function Hero() {
         >
           {hero.title}
         </h1>
-        <div className="h-px w-40 bg-white/70 md:w-56" aria-hidden="true" />
+        <Separator className="bg-white/70 data-horizontal:w-40 md:data-horizontal:w-56" />
       </div>
 
       {/* Mobile-only scroll cue, per the comp. */}
@@ -41,7 +43,7 @@ export function Hero() {
         className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white transition-opacity hover:opacity-70 md:hidden"
       >
         <span className="sr-only">{hero.scrollLabel}</span>
-        <ChevronDownIcon className="h-4 w-8" />
+        <ChevronDownIcon strokeWidth={1.5} className="size-9" />
       </a>
     </section>
   );

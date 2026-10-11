@@ -5,6 +5,7 @@ import { proxima } from "./fonts";
 import { contact, site } from "@/content/site";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -50,7 +51,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={`${proxima.variable} h-full`}>
+    <html lang="es" className={cn("h-full font-sans", proxima.variable)}>
       <body className="flex min-h-full flex-col">
         <a
           href="#lo-que-ofrecemos"
