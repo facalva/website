@@ -14,6 +14,20 @@
  */
 export const SHOW_COLLECTIONS_ON_MOBILE = true;
 
+/**
+ * Features that are designed but not functional yet. Hidden rather than
+ * deleted: flipping a flag back on restores the comp's layout, including the
+ * header arrangement (mónica returns to the left, nav + search to the right).
+ */
+export const features = {
+  /** Nuestros Pasos and Contacto pages don't exist yet. */
+  secondaryNav: false,
+  /** No product catalogue to search yet. */
+  search: false,
+  /** The Instagram/Twitter/Facebook handles in `social` are unconfirmed guesses. */
+  socialLinks: false,
+} as const;
+
 export const site = {
   name: "FACALVA",
   tagline: "Vanguardia Artesanal",
@@ -30,19 +44,23 @@ export const site = {
  * Light variants for the dark header, brown for the white drawer; both keep
  * the same aspect ratio, so height alone sizes them.
  */
-export const nav = [
-  {
+export const brandNav = {
+  alvarado: {
     label: "Alvarado Collection",
     href: "#",
     wordmark: { light: "/brand/wordmark-ac-white.svg", dark: "/brand/wordmark-ac-brown.svg", ratio: 16.77 },
   },
-  {
+  monica: {
     label: "mónica",
     href: "#",
     wordmark: { light: "/brand/wordmark-monica-white.svg", dark: "/brand/wordmark-monica-brown.svg", ratio: 4.35 },
   },
-  { label: "Nuestros Pasos", href: "#", wordmark: null },
-  { label: "Contacto", href: "#", wordmark: null },
+} as const;
+
+/** Text links; rendered only when `features.secondaryNav` is on. */
+export const secondaryNav = [
+  { label: "Nuestros Pasos", href: "#" },
+  { label: "Contacto", href: "#" },
 ] as const;
 
 export const hero = {
@@ -127,6 +145,11 @@ export const contact = {
   rights: "Todos los derechos reservados, FACALVA",
 } as const;
 
+/**
+ * Rendered only when `features.socialLinks` is on. The WhatsApp number comes
+ * from the comp; the other three handles are guesses and must be confirmed
+ * before enabling. Icons are brand SVGs in public/icons/social/.
+ */
 export const social = [
   { id: "whatsapp", label: "WhatsApp", href: "https://wa.me/50224330043" },
   { id: "instagram", label: "Instagram", href: "https://www.instagram.com/facalva" },
@@ -134,9 +157,9 @@ export const social = [
   { id: "facebook", label: "Facebook", href: "https://www.facebook.com/facalva" },
 ] as const;
 
+/** Rendered only when `features.search` is on. */
 export const search = {
   placeholder: "Zapato Casual",
   label: "Buscar calzado",
-  /** No product catalogue exists yet, so the field is deliberately inert. */
-  unavailableNote: "La búsqueda estará disponible próximamente",
+  submitLabel: "Buscar",
 } as const;

@@ -18,7 +18,9 @@ export const proxima = localFont({
     { path: "./fonts/ProximaNova-Regular.woff2", weight: "400", style: "normal" },
     { path: "./fonts/ProximaNova-Bold.woff2", weight: "700", style: "normal" },
   ],
-  variable: "--font-proxima",
+  // shadcn's convention: the theme reads --font-sans (see globals.css), so
+  // every shadcn component picks up Proxima with no per-component font rules.
+  variable: "--font-sans",
   display: "swap",
   preload: true,
   fallback: ["ui-sans-serif", "Helvetica Neue", "Arial", "sans-serif"],

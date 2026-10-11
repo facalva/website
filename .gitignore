@@ -41,5 +41,4 @@ yarn-error.log*
 next-env.d.ts
 
 # generated intermediates / local tooling output
-/.svg-inline/
 /.shots/

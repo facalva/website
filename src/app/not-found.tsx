@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 
 export const metadata = { title: "Página no encontrada" };
 
@@ -12,9 +12,9 @@ export default function NotFound() {
       <p className="text-brand-700 max-w-[46ch] text-sm">
         Es posible que el enlace esté roto o que la página se haya movido.
       </p>
-      <Link href="/" className={buttonVariants({ className: "mt-2" })}>
-        Volver al inicio
-      </Link>
+      <Button asChild size="lg" className="mt-2 px-6">
+        <Link href="/">Volver al inicio</Link>
+      </Button>
     </div>
   );
 }

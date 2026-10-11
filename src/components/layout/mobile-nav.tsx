@@ -1,51 +1,71 @@
 "use client";
 
 import Link from "next/link";
+import { MenuIcon } from "lucide-react";
 
-import { nav } from "@/content/site";
-import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { brandNav, features, secondaryNav } from "@/content/site";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { FacalvaWordmark } from "@/components/brand/facalva-wordmark";
-import { HamburgerIcon } from "@/components/icons";
+import { SubBrandLogo } from "@/components/brand/sub-brand-logo";
+import { cn } from "@/lib/utils";
+
+const navLinkClass = "h-auto min-h-13 w-full justify-start px-8 py-4";
 
 /** Tablet and mobile navigation drawer. Hidden from lg up. */
 export function MobileNav() {
   return (
     <Sheet>
-      <SheetTrigger
-        aria-label="Abrir menú"
-        className="-m-2 flex size-11 items-center justify-center p-2 text-white transition-opacity hover:opacity-70 lg:hidden"
-      >
-        <HamburgerIcon className="h-5 w-6" />
+      <SheetTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon-lg"
+          aria-label="Abrir menú"
+          className="text-white hover:bg-white/10 hover:text-white lg:hidden"
+        >
+          <MenuIcon strokeWidth={1.5} className="size-6" />
+        </Button>
       </SheetTrigger>
 
-      <SheetContent title="Menú principal" className="lg:hidden">
-        <div className="flex flex-col gap-6 px-8 pt-7">
+      <SheetContent side="left" className="gap-0 lg:hidden">
+        <SheetHeader className="gap-6 px-8 pt-7 pb-0">
+          {/* Radix requires a dialog title; the comp shows the wordmark instead. */}
+          <SheetTitle className="sr-only">Menú principal</SheetTitle>
           <FacalvaWordmark tone="dark" size="drawer" />
-          <div className="bg-taupe-300 h-px w-full" aria-hidden="true" />
-        </div>
+          <Separator />
+        </SheetHeader>
 
         <nav className="mt-2 flex flex-col">
-          {nav.map((item) => (
-            <SheetClose asChild key={item.label}>
-              <Link
-                href={item.href}
-                className="text-brand-700 hover:bg-surface-50 flex min-h-[52px] items-center px-8 py-4 text-sm tracking-eyebrow uppercase transition-colors"
-              >
-                {item.wordmark ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
-                    src={item.wordmark.dark}
-                    alt={item.label}
-                    width={Math.round(item.wordmark.ratio * 18)}
-                    height={18}
-                    className={item.label === "mónica" ? "h-5 w-auto" : "h-3.5 w-auto"}
-                  />
-                ) : (
-                  item.label
-                )}
-              </Link>
+          {(Object.keys(brandNav) as (keyof typeof brandNav)[]).map((brand) => (
+            <SheetClose asChild key={brand}>
+              <Button asChild variant="ghost" className={navLinkClass}>
+                <Link href={brandNav[brand].href}>
+                  <SubBrandLogo brand={brand} tone="dark" size="drawer" />
+                </Link>
+              </Button>
             </SheetClose>
           ))}
+
+          {features.secondaryNav &&
+            secondaryNav.map((item) => (
+              <SheetClose asChild key={item.label}>
+                <Button
+                  asChild
+                  variant="ghost"
+                  className={cn(navLinkClass, "font-normal tracking-eyebrow text-brand-700 uppercase")}
+                >
+                  <Link href={item.href}>{item.label}</Link>
+                </Button>
+              </SheetClose>
+            ))}
         </nav>
       </SheetContent>
     </Sheet>

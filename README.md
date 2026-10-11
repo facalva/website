@@ -8,10 +8,10 @@ desktop / tablet / mobile comps).
 
 ## Stack
 
-Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · Radix primitives · TypeScript.
+Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · shadcn/ui (Radix) · lucide icons · TypeScript.
 
-Every section is a Server Component. The only client boundary on the page is the
-mobile navigation drawer.
+Every section is a Server Component. Client code is limited to shadcn's
+Radix-backed primitives: the navigation drawer (`sheet`) and `separator`.
 
 ## Development
 
@@ -30,7 +30,7 @@ needs none of it:
 
 ```bash
 npm run prep         # both of the below
-npm run prep:svg     # normalize SVGs → public/, regenerate icon components
+npm run prep:svg     # normalize brand SVGs → public/
 npm run prep:img     # photos → optimized WebP in public/img/
 ```
 
@@ -42,9 +42,11 @@ All tokens live in `src/app/globals.css`, in two layers:
 
 1. **Brand tokens** (`@theme`) — the palette, type scale and tracking values
    transcribed from the style guide.
-2. **Semantic layer** (`:root` + `@theme inline`) — maps those onto the
-   conventional `--primary` / `--background` / `--border` names so UI
-   primitives inherit the brand without per-component overrides.
+2. **shadcn theme** (`:root` + `@theme inline`) — the structure `shadcn init`
+   generates, with the brand mapped onto shadcn's semantic variables
+   (`--primary`, `--background`, `--border`, …). Every shadcn component reads
+   these, so components are styled here rather than in their source. See
+   "UI components" below for the mapping.
 
 Colours are **hex, not OKLCH**. These are contractual brand values from a PDF;
 converting them produces values nobody can verify against the guide and that
@@ -54,7 +56,91 @@ alpha modifiers, so nothing is lost.
 There is **no dark mode**. The guide defines one light palette, every comp is
 light, and `logo-monica.svg` is magenta-on-white with no dark counterpart.
 
-`--radius: 0` — the comps are square-cornered throughout.
+`--radius: 0` — the comps are square-cornered throughout. Every `rounded-*`
+class in the shadcn components resolves through it.
+
+## UI components (shadcn/ui)
+
+UI primitives come from [shadcn/ui](https://ui.shadcn.com), installed with its
+CLI into `src/components/ui/`. They are **not** hand-written; don't add a
+component shadcn already provides — install it instead.
+
+| Component | Used for |
+|---|---|
+| `button` | 404 call-to-action, drawer trigger and links, search submit |
+| `sheet` | Tablet/mobile navigation drawer (`layout/mobile-nav.tsx`) |
+| `separator` | Hairline rules: hero, "Lo que ofrecemos", drawer |
+| `input-group` (+ `input`, `textarea`) | Header search field (`layout/search-field.tsx`) |
+
+Configuration lives in `components.json` (Radix base, `radix-nova` style,
+lucide icons). Icons come from `lucide-react`, the set shadcn's own components
+use, drawn at `strokeWidth={1.5}` to match the guide's thin outline style.
+
+### Adding a component
+
+```bash
+npx shadcn@latest add <name>        # e.g. dropdown-menu, checkbox, command
+```
+
+The guide already specifies dropdowns, checkboxes, tags and a search
+autocomplete for the collection pages; those map to `dropdown-menu`/`select`,
+`checkbox`, `badge`/`toggle-group` and `command` + `popover`.
+
+> **Cloud sessions:** the CLI fetches from `ui.shadcn.com`, which isn't on the
+> default *Trusted* network allowlist. The environment needs **Network access →
+> Custom** with `ui.shadcn.com` added and **"Also include default list of
+> common package managers"** checked (otherwise npm is blocked too).
+
+### How the brand maps onto shadcn
+
+| shadcn variable | Value | Brand role |
+|---|---|---|
+| `--primary` / `--primary-foreground` | `#8e7d6b` / `#ffffff` | Taupe — the guide's primary accent |
+| `--background` / `--foreground` | `#ffffff` / `#532400` | Page and body copy |
+| `--secondary` | `#bfb2a7` | Secondary taupe |
+| `--muted` / `--accent` / `--card` | `#e9e9e9` / `#f3f2f0` / `#f3f2f0` | Surfaces |
+| `--border` / `--input` | `#bfb2a7` / `#8e7d6b` | Hairlines, field outlines |
+| `--destructive` / `--ring` | `#934c1c` | "Alertas y búsqueda" burnt orange |
+| `--radius` | `0` | Square corners |
+| `--font-sans` | Proxima Nova | Set by `next/font` in `src/app/fonts.ts` |
+
+`--chart-*` and `--sidebar-*` are unused but mapped to the palette, so those
+components arrive on-brand if added.
+
+### Local edits to shadcn source
+
+Styling goes through the theme. These are the only edits to CLI-generated
+files — re-apply them if a component is reinstalled with `--overwrite`:
+
+| File | Edit | Why |
+|---|---|---|
+| `ui/button.tsx` | `default` variant: `font-bold`, `border-primary`, hover → `bg-background text-primary` | Guide's "Botones / Primario": filled taupe, inverting to white + taupe border |
+| `ui/sheet.tsx` | Close button's sr-only label `Close` → `Cerrar` | Site is in Spanish |
+
+`init` also inserts Geist as `--font-sans` in `layout.tsx` and a `.dark`
+block in `globals.css`; both were removed (Proxima is the brand face, and the
+site is light-only). `@custom-variant dark` is kept on purpose — it scopes
+shadcn's `dark:` utilities to a `.dark` class that's never set, so they stay
+inert on a dark-mode OS.
+
+`cn()` comes from shadcn's [`cn`](https://github.com/shadcn-ui/cn) package (a
+drop-in for clsx + tailwind-merge), re-exported from `src/lib/utils.ts`.
+
+## Feature flags
+
+Designed-but-unfinished features are hidden, not deleted, via `features` in
+`src/content/site.ts`:
+
+| Flag | Hides | Turn on when |
+|---|---|---|
+| `secondaryNav` | Nuestros Pasos / Contacto links (header + drawer) | Those pages exist |
+| `search` | Header search field | Search is implemented |
+| `socialLinks` | Footer social icons | Instagram/Twitter/Facebook handles are confirmed — the current ones are guesses |
+
+While `secondaryNav` and `search` are off, the desktop header is balanced as
+Alvarado Collection · FACALVA · mónica. Turning either on restores the comp's
+layout (both sub-brands left, nav + search right). All three are verified to
+build and render with the flag on.
 
 ## SVG handling
 
@@ -68,17 +154,19 @@ rules collide and both render wrong.
 against it: after the pass no `<style>` block and no `class` attribute
 survives. It asserts this and exits non-zero if anything slipped through.
 
-Three tiers, deliberately on different configs:
+Generic UI icons (menu, chevron, map pin, phone, mail, search) are
+`lucide-react`, not brand files. What remains is brand art, all rendered via
+`<img>`, in two tiers:
 
-| Tier | Files | Output | Rendering |
+| Tier | Files | Output | Treatment |
 |---|---|---|---|
-| Brand art | `logo-*`, `wordmark-*` | `public/brand/` | `<img>` — multi-colour, never recoloured, already scoped as separate documents |
-| UI icons | `icon-*` | `src/components/icons/` | Inlined TSX with `stroke="currentColor"` so Tailwind text utilities drive colour |
-| Illustrations | `beneficio-*` | `public/icons/` | `<img loading="lazy">`, keeping a literal `#8e7d6b` |
+| Brand art | `logo-*`, `wordmark-*` | `public/brand/` | Multi-colour, never recoloured; already scoped as separate documents |
+| Standalone | `beneficio-*`, `social-*` | `public/icons/`, `public/icons/social/` | Style blocks flattened; literal `#8e7d6b` kept |
 
-⚠ The third row's literal hex is load-bearing. Inside an `<img>`-loaded SVG,
-`currentColor` resolves against that SVG's own root colour — which defaults to
-**black**. Tiers 2 and 3 must not share a config.
+⚠ The literal hex is load-bearing. Inside an `<img>`-loaded SVG, `currentColor`
+resolves against that SVG's own root colour — which defaults to **black**.
+The social marks are brand files rather than lucide because lucide has no
+WhatsApp icon and has deprecated its brand icons.
 
 `<img>` is used rather than `next/image` for SVGs: the latter requires
 `dangerouslyAllowSVG`, which enables SVG handling app-wide, and Next cannot
@@ -142,14 +230,12 @@ Three, all deliberate:
 
 ## Known scope limits
 
-- **Search is deliberately inert.** No product catalogue exists yet, so the
-  header field is rendered per the guide but disabled and visibly
-  de-emphasised — a control that looks live but does nothing is worse than one
-  that reads as not-yet-available. The comp's autocomplete dropdown needs a
-  product index and is out of scope.
-- **Nav links are placeholders** (`href="#"`). This is the landing page only;
-  the collection, Nuestros Pasos and Contacto routes don't exist yet. A
-  brand-styled `not-found.tsx` ships as insurance.
+- **Search, secondary nav and social links are hidden** behind feature flags
+  (see above) until they're functional. The comp's search autocomplete needs a
+  product index; it maps to shadcn `command` + `popover`.
+- **Sub-brand links are placeholders** (`href="#"`). This is the landing page
+  only; the collection pages don't exist yet. A brand-styled `not-found.tsx`
+  ships as insurance.
 - **Address** is transcribed verbatim from the comp
   ("0 avenida C 3-36 zona 4 de Mixco…") and is worth confirming.
 - `npm audit` reports transitive advisories in the eslint / postcss / sharp

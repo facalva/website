@@ -1,47 +1,44 @@
+import { SearchIcon } from "lucide-react";
+
 import { search } from "@/content/site";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { SearchIcon } from "@/components/icons";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { cn } from "@/lib/utils";
 
 /**
- * The header search field.
+ * Header search, per the style guide's "Búsqueda" spec: dark brown field with
+ * an attached burnt-orange square button. Composed entirely from shadcn's
+ * InputGroup; only the skin is set here.
  *
- * There is no product catalogue behind it yet, so it is rendered per the style
- * guide but deliberately inert and visibly de-emphasised — a control that
- * looks live but silently does nothing is worse than one that reads as
- * not-yet-available. Disabled + reduced opacity + an explanatory title, and it
- * stays out of the tab order.
+ * Hidden until search is implemented (`features.search` in content/site.ts).
+ * There is no product catalogue yet, so there is nothing to submit to.
  */
 export function SearchField({ className }: { className?: string }) {
   return (
-    <div
-      className={cn("flex h-8 items-stretch opacity-45", className)}
-      title={search.unavailableNote}
-    >
-      <Input
-        type="search"
-        disabled
-        aria-disabled="true"
-        tabIndex={-1}
-        aria-label={search.label}
-        placeholder={search.placeholder}
-        className={cn(
-          "border-brand-500 bg-brand-900 h-full rounded-none border-r-0 text-white",
-          "placeholder:text-taupe-300 disabled:cursor-not-allowed disabled:opacity-100",
-        )}
-      />
-      <Button
-        variant="search"
-        size="icon"
-        disabled
-        aria-disabled="true"
-        tabIndex={-1}
-        className="h-full w-9 rounded-none disabled:opacity-100"
-      >
-        <span className="sr-only">{search.unavailableNote}</span>
-        <SearchIcon className="h-4 w-3" />
-      </Button>
-    </div>
+    <form role="search" className={cn("w-full", className)}>
+      <InputGroup className="h-8 border-brand-500 bg-brand-900">
+        <InputGroupInput
+          type="search"
+          name="q"
+          aria-label={search.label}
+          placeholder={search.placeholder}
+          className="text-white placeholder:text-taupe-300"
+        />
+        <InputGroupAddon align="inline-end" className="h-full p-0 has-[>button]:mr-0">
+          <InputGroupButton
+            type="submit"
+            size="icon-sm"
+            className="h-full bg-brand-500 text-white hover:bg-brand-500/85 hover:text-white"
+          >
+            <SearchIcon strokeWidth={1.5} />
+            <span className="sr-only">{search.submitLabel}</span>
+          </InputGroupButton>
+        </InputGroupAddon>
+      </InputGroup>
+    </form>
   );
 }
